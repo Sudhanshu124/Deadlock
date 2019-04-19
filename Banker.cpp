@@ -1,134 +1,74 @@
-// C++ program to illustrate Banker's Algorithm 
-#include<iostream> 
-using namespace std; 
+#include<stdio.h>
+#include<conio.h>
+int main()
+{
+int k=0,output[10],d=0,t=0,ins[5],i,avail[5],allocated[10][5],need[10][5],MAX[10][5],pno,P[10],j,rz, count=0;
+printf("\n Enter the number of resources : ");
+scanf("%d", &rz);
+printf("\n enter the max instances of each resources\n");
+for(i=0;i<rz;i++)
+{  avail[i]=0;
+printf("%c= ",(i+97));
+scanf("%d",&ins[i]);
+}
+printf("\n Enter the number of processes : ");
+scanf("%d", &pno);
+printf("\n Enter the allocation matrix \n     ");
 
-// Number of processes 
-const int P = 5; 
+for(i=0;i<rz;i++)
+printf(" %c",(i+97));
+printf("\n");
+for(i=0;i <pno;i++)
+{           P[i]=i;
+printf("P[%d]  ",P[i]);
+for(j=0;j<rz;j++)
+{
+scanf("%d",&allocated[i][j]);
+avail[j]+=allocated[i][j];
+}
+}
 
-// Number of resources 
-const int R = 3; 
+printf("\nEnter the MAX matrix \n     ");
+for(i=0;i<rz;i++)
+{          printf(" %c",(i+97));
+avail[i]=ins[i]-avail[i];
+}
+printf("\n");
+for(i=0;i <pno;i++)
+{
+printf("P[%d]  ",i);
+ for(j=0;j<rz;j++)
+ scanf("%d", &MAX[i][j]);
+}
 
-// Function to find the need of each process 
-void calculateNeed(int need[P][R], int maxm[P][R], 
-				int allot[P][R]) 
-{ 
-	// Calculating Need of each P 
-	for (int i = 0 ; i < P ; i++) 
-		for (int j = 0 ; j < R ; j++) 
+printf("\n");
+A: d=-1;
+for(i=0;i <pno;i++)
+{ count=0; t=P[i];
+ for(j=0;j<rz;j++)
+ {
+ need[t][j] = MAX[t][j]-allocated[t][j];
+ if(need[t][j]<=avail[j])
+ count++;
+ }
+if(count==rz)
+{
+output[k++]=P[i];
+ for(j=0;j<rz;j++)
+avail[j]+=allocated[t][j];
+}
+else
+ P[++d]=P[i];
+}
 
-			// Need of instance = maxm instance - 
-			//				 allocated instance 
-			need[i][j] = maxm[i][j] - allot[i][j]; 
-} 
-
-// Function to find the system is in safe state or not 
-bool isSafe(int processes[], int avail[], int maxm[][R], 
-			int allot[][R]) 
-{ 
-	int need[P][R]; 
-
-	// Function to calculate need matrix 
-	calculateNeed(need, maxm, allot); 
-
-	// Mark all processes as infinish 
-	bool finish[P] = {0}; 
-
-	// To store safe sequence 
-	int safeSeq[P]; 
-
-	// Make a copy of available resources 
-	int work[R]; 
-	for (int i = 0; i < R ; i++) 
-		work[i] = avail[i]; 
-
-	// While all processes are not finished 
-	// or system is not in safe state. 
-	int count = 0; 
-	while (count < P) 
-	{ 
-		// Find a process which is not finish and 
-		// whose needs can be satisfied with current 
-		// work[] resources. 
-		bool found = false; 
-		for (int p = 0; p < P; p++) 
-		{ 
-			// First check if a process is finished, 
-			// if no, go for next condition 
-			if (finish[p] == 0) 
-			{ 
-				// Check if for all resources of 
-				// current P need is less 
-				// than work 
-				int j; 
-				for (j = 0; j < R; j++) 
-					if (need[p][j] > work[j]) 
-						break; 
-
-				// If all needs of p were satisfied. 
-				if (j == R) 
-				{ 
-					// Add the allocated resources of 
-					// current P to the available/work 
-					// resources i.e.free the resources 
-					for (int k = 0 ; k < R ; k++) 
-						work[k] += allot[p][k]; 
-
-					// Add this process to safe sequence. 
-					safeSeq[count++] = p; 
-
-					// Mark this p as finished 
-					finish[p] = 1; 
-
-					found = true; 
-				} 
-			} 
-		} 
-
-		// If we could not find a next process in safe 
-		// sequence. 
-		if (found == false) 
-		{ 
-			cout << "System is not in safe state"; 
-			return false; 
-		} 
-	} 
-
-	// If system is in safe state then 
-	// safe sequence will be as below 
-	cout << "System is in safe state.\nSafe"
-		" sequence is: "; 
-	for (int i = 0; i < P ; i++) 
-		cout << safeSeq[i] << " "; 
-
-	return true; 
-} 
-
-// Driver code 
-int main() 
-{ 
-	int processes[] = {0, 1, 2, 3, 4}; 
-
-	// Available instances of resources 
-	int avail[] = {3, 3, 2}; 
-
-	// Maximum R that can be allocated 
-	// to processes 
-	int maxm[][R] = {{7, 5, 3}, 
-					{3, 2, 2}, 
-					{9, 0, 2}, 
-					{2, 2, 2}, 
-					{4, 3, 3}}; 
-
-	// Resources allocated to processes 
-	int allot[][R] = {{0, 1, 0}, 
-					{2, 0, 0}, 
-					{3, 0, 2}, 
-					{2, 1, 1}, 
-					{0, 0, 2}}; 
-
-	// Check system is in safe state or not 
-	isSafe(processes, avail, maxm, allot); 
-
-	return 0; 
-} 
-
+if(d!=-1)
+{ pno=d+1;
+goto A;
+}
+printf("-----Safe state is-------\n");
+printf("\t <");
+for(i=0;i<k;i++)
+printf(" P[%d] ",output[i]);
+printf(">");
+getch();
+}
